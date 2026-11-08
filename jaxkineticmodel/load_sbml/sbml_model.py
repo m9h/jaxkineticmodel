@@ -21,6 +21,9 @@ class SBMLModel:
 
     def __init__(self, file_path):
         self.model = self._load_model(file_path)
+        unsupported_rules = [r for r in self.model.getListOfRules() if not r.isAssignment()]
+        if unsupported_rules:
+            raise NotImplementedError("Rate rules and algebraic rules are not supported; only assignment rules are supported")
         self.S = self._get_stoichiometric_matrix()
         # TODO the following two lines assume that self.S will never change
         self.reaction_names = list(self.S.columns)
@@ -29,6 +32,8 @@ class SBMLModel:
         self.parameters = self._get_parameters()
         self.initial_assignments = self._get_initial_assignments()
         self.y0 = self._get_initial_conditions()
+        self.amount_species = tuple(s.getId() for s in self.model.getListOfSpecies()
+                                    if species_uses_amount(s, self.model))
 
         self.y0, self.parameters = self._update_with_initial_assignments()
         self.y0 = jnp.array(list(self.y0.values()))
@@ -173,9 +178,9 @@ class SBMLModel:
                 elif not specimen.getBoundaryCondition() and not specimen.getConstant():
                     if specimen.isSetInitialConcentration():
 
-                        initial_concentration_dict[specimen.id] = specimen.initial_concentration
+                        initial_concentration_dict[specimen.id] = initial_species_value(specimen, self.model)
                     elif specimen.isSetInitialAmount():
-                        initial_concentration_dict[specimen.id] = specimen.initial_amount
+                        initial_concentration_dict[specimen.id] = initial_species_value(specimen, self.model)
                     else:
                         logger.error(f"specimen {specimen.id} has no initial amount or concentration set")
             else:
@@ -245,11 +250,11 @@ class SBMLModel:
 
         include = ['y0', 'parameters', 'species_compartments',
                    'compartment_values', 'boundary_conditions',
-                   'lambda_functions', 'assignment_rules', 'event_rules', 'compartments']
+                   'lambda_functions', 'assignment_rules', 'event_rules', 'compartments', 'amount_species']
         kwargs = {i: kwargs[i] for i in include}
 
         return NeuralODE(
-            fluxes=self.v,
+            fluxes=self.v.copy(),
             stoichiometric_matrix=self.S,
             compile = compile,
             **kwargs)
@@ -277,6 +282,23 @@ def get_compartments(model):
     return compartment_dict
 
 
+def species_uses_amount(species, model):
+    """The SBML species symbol denotes amount for substance-only/0-D species."""
+    return (species.getHasOnlySubstanceUnits()
+            or model.getCompartment(species.getCompartment()).getSpatialDimensions() == 0)
+
+
+def initial_species_value(species, model):
+    """Convert the initial value to the units of its SBML species symbol."""
+    volume = model.getCompartment(species.getCompartment()).getSize()
+    amount = species_uses_amount(species, model)
+    if species.isSetInitialAmount():
+        return species.getInitialAmount() if amount else species.getInitialAmount() / volume
+    if species.isSetInitialConcentration():
+        return species.getInitialConcentration() * volume if amount else species.getInitialConcentration()
+    raise ValueError(f"Species {species.getId()} has no initial amount or concentration")
+
+
 def get_constant_boundary_species(model):
     """Species that are boundary conditions should be fed as fixed, non-learnable parameters
     https://synonym.caltech.edu/software/libsbml/5.18.0/docs/formatted/python-api/classlibsbml_1_1_species.html"""
@@ -284,12 +306,12 @@ def get_constant_boundary_species(model):
     boundary_compartments = {}
     species = model.getListOfSpecies()
     for specimen in species:
-        if specimen.getBoundaryCondition():
+        if specimen.getBoundaryCondition() or specimen.getConstant():
             boundary_compartments[specimen.id] = specimen.getCompartment()
             if specimen.isSetInitialConcentration():
-                constant_boundary[specimen.id] = specimen.initial_concentration
+                constant_boundary[specimen.id] = initial_species_value(specimen, model)
             elif specimen.isSetInitialAmount():
-                constant_boundary[specimen.id] = specimen.initial_amount
+                constant_boundary[specimen.id] = initial_species_value(specimen, model)
             # else:
             #     logger.error(f"specimen {specimen.id} has no initial concentration or amount.")
 

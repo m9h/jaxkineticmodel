@@ -3,6 +3,12 @@
 # JaxKineticModel
 Python package to simulate, build, and train kinetic models.
 
+This fork updates the project to Python 3.12+ and JAX 0.12, with a locked
+environment, independent RoadRunner/COPASI validation, shared BioModels fixtures,
+and a differentiable MAPK intervention example. See the
+[migration and validation guide](validation/README.md) for the equations,
+reproduction commands, numerical results and remaining SBML limitations.
+
 ### Installation
 Install the package using
 ```

@@ -24,7 +24,8 @@ class JaxKineticModel:
             reaction_names,
             compartment_values,
             species_compartments,
-            boundary_conditions
+            boundary_conditions,
+            rate_divisors=None,
     ):
         """Initialize given the following arguments:
         v: the flux functions given as lambdified jax functions,
@@ -39,6 +40,7 @@ class JaxKineticModel:
         self.species_names = np.array(species_names)
         self.reaction_names = np.array(reaction_names)
         self.compartment_values = jnp.array(compartment_values)
+        self.rate_divisors = self.compartment_values if rate_divisors is None else jnp.array(rate_divisors)
         self.species_compartments = species_compartments
         self.boundary_conditions = boundary_conditions
         self.argument_names = self._get_co_varnames()
@@ -84,7 +86,7 @@ class JaxKineticModel:
         # )  # perhaps there is a way to vectorize this in a better way
         dY = jnp.matmul(self.stoichiometry, flux_array)  # dMdt=S*v(t)
 
-        dY /= self.compartment_values
+        dY /= self.rate_divisors
         return dY
 
 
@@ -126,6 +128,7 @@ class NeuralODE:
 
         self.y0 = kwargs['y0'] #not used in training, but only to process the initial conditions in Trainer object
         self.parameters = kwargs['parameters'] #not used in training,
+        self.amount_species = kwargs.get('amount_species', ())
         # but only to process the initial conditions in Trainer object
 
         #defined after compilation
@@ -190,7 +193,9 @@ class NeuralODE:
                                     reaction_names=self.stoichiometry.columns,
                                     compartment_values=self.compartment_values,
                                     species_compartments=self.species_compartments,
-                                    boundary_conditions=self.boundary_conditions)
+                                    boundary_conditions=self.boundary_conditions,
+                                    rate_divisors=[1.0 if s in self.amount_species else v
+                                                   for s, v in zip(self.species_names, self.compartment_values)])
         for key in constant_parameters.keys():
             self.parameters.pop(key)
 

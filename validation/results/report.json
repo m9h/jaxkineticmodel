@@ -1,0 +1,727 @@
+{
+  "versions": {
+    "jaxkineticmodel": "0.0.1",
+    "jax": "0.12.0.1",
+    "jaxlib": "0.12.0.1",
+    "diffrax": "0.7.2",
+    "equinox": "0.13.8",
+    "optax": "0.2.8",
+    "numpy": "2.5.4",
+    "libroadrunner": "2.11.0",
+    "copasi-basico": "0.92",
+    "python-copasi": "4.48.311",
+    "python-libsbml": "5.21.2"
+  },
+  "platform": "macOS-27.2-arm64-arm-64bit",
+  "python": "3.12.13",
+  "devices": [
+    "cpu:0"
+  ],
+  "x64": true,
+  "solver": "Kvaerno5",
+  "solver_rtol": 1e-09,
+  "solver_atol": 1e-11,
+  "comparison_rtol": 2e-05,
+  "comparison_atol": 1e-07,
+  "cases": {
+    "constant_1": {
+      "file": "constant.xml",
+      "sha256": "d1d8bd2f3c0df2db4ed64e1629703da9f28191a0dd5a594f87337e1069671f5c",
+      "species": [
+        "A",
+        "B"
+      ],
+      "samples": 2,
+      "time_start": 0.0,
+      "time_end": 1.0,
+      "quantity": "amount",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 8.599148060284278e-10,
+          "max_scaled_error": 5.804277533838149e-05,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 9.806966350112134e-11,
+          "max_scaled_error": 6.619540165170819e-06,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 9.57983692373432e-10,
+          "max_scaled_error": 6.466231549586797e-05,
+          "passed": true
+        },
+        "jax_exact": {
+          "max_absolute_error": 1.0277090289889657e-10,
+          "max_scaled_error": 6.936866052796616e-06,
+          "passed": true
+        },
+        "roadrunner_exact": {
+          "max_absolute_error": 9.626852648381146e-10,
+          "max_scaled_error": 6.49796413831254e-05,
+          "passed": true
+        },
+        "copasi_exact": {
+          "max_absolute_error": 4.701572464682613e-12,
+          "max_scaled_error": 3.1732588766780825e-07,
+          "passed": true
+        }
+      }
+    },
+    "constant_10": {
+      "file": "constant.xml",
+      "sha256": "d1d8bd2f3c0df2db4ed64e1629703da9f28191a0dd5a594f87337e1069671f5c",
+      "species": [
+        "A",
+        "B"
+      ],
+      "samples": 11,
+      "time_start": 0.0,
+      "time_end": 1.0,
+      "quantity": "amount",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 2.2778854136262794e-08,
+          "max_scaled_error": 0.0012603692521858268,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 2.2271057886769086e-08,
+          "max_scaled_error": 0.001232272533126607,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 1.4275893800430595e-09,
+          "max_scaled_error": 0.00017283828825874625,
+          "passed": true
+        },
+        "jax_exact": {
+          "max_absolute_error": 2.2211801731231162e-08,
+          "max_scaled_error": 0.0012289938749011377,
+          "passed": true
+        },
+        "roadrunner_exact": {
+          "max_absolute_error": 1.4622756339122134e-09,
+          "max_scaled_error": 0.00017666809610605673,
+          "passed": true
+        },
+        "copasi_exact": {
+          "max_absolute_error": 2.640061502745539e-10,
+          "max_scaled_error": 1.7819963717536196e-05,
+          "passed": true
+        }
+      }
+    },
+    "time_dependent_1": {
+      "file": "time_dependent.xml",
+      "sha256": "9b4054516ef9dc55c580dede78a7005c1e8f8bd3b311a6ba4cb18146517fb125",
+      "species": [
+        "A",
+        "B"
+      ],
+      "samples": 2,
+      "time_start": 0.0,
+      "time_end": 1.0,
+      "quantity": "amount",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 3.079471566636016e-09,
+          "max_scaled_error": 0.000341207867843494,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 9.458905325665512e-10,
+          "max_scaled_error": 0.00010480541829491454,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 4.025361988180265e-09,
+          "max_scaled_error": 0.0004460132854231999,
+          "passed": true
+        },
+        "jax_exact": {
+          "max_absolute_error": 2.6905144778766044e-12,
+          "max_scaled_error": 2.98068074991426e-07,
+          "passed": true
+        },
+        "roadrunner_exact": {
+          "max_absolute_error": 3.0767813297138957e-09,
+          "max_scaled_error": 0.00034090979977053487,
+          "passed": true
+        },
+        "copasi_exact": {
+          "max_absolute_error": 9.485807694886716e-10,
+          "max_scaled_error": 0.0001051034863692812,
+          "passed": true
+        }
+      }
+    },
+    "time_dependent_10": {
+      "file": "time_dependent.xml",
+      "sha256": "9b4054516ef9dc55c580dede78a7005c1e8f8bd3b311a6ba4cb18146517fb125",
+      "species": [
+        "A",
+        "B"
+      ],
+      "samples": 11,
+      "time_start": 0.0,
+      "time_end": 1.0,
+      "quantity": "amount",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 2.9568592019302287e-09,
+          "max_scaled_error": 0.0003696420435512054,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 1.6703360916636711e-09,
+          "max_scaled_error": 0.00012701016063154243,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 4.244988804913419e-09,
+          "max_scaled_error": 0.000332691016722699,
+          "passed": true
+        },
+        "jax_exact": {
+          "max_absolute_error": 6.498870330773343e-10,
+          "max_scaled_error": 8.124348743923368e-05,
+          "passed": true
+        },
+        "roadrunner_exact": {
+          "max_absolute_error": 2.6829725108257207e-09,
+          "max_scaled_error": 0.0002883985565805818,
+          "passed": true
+        },
+        "copasi_exact": {
+          "max_absolute_error": 1.562016294087698e-09,
+          "max_scaled_error": 0.00011678660014042292,
+          "passed": true
+        }
+      }
+    },
+    "state_dependent_1": {
+      "file": "state_dependent.xml",
+      "sha256": "5d5389dffa6dd4ab677974718f19ef29e3db2c75edfc2b2bd38d57bd34f0439e",
+      "species": [
+        "A",
+        "B"
+      ],
+      "samples": 2,
+      "time_start": 0.0,
+      "time_end": 1.0,
+      "quantity": "amount",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 5.700192096114165e-09,
+          "max_scaled_error": 0.00042433191422345786,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 6.561511334268744e-10,
+          "max_scaled_error": 4.884494793741794e-05,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 6.356342563407225e-09,
+          "max_scaled_error": 0.0004731768617463464,
+          "passed": true
+        },
+        "jax_exact": {
+          "max_absolute_error": 4.218847493575595e-13,
+          "max_scaled_error": 3.1389283232186334e-08,
+          "passed": true
+        },
+        "roadrunner_exact": {
+          "max_absolute_error": 5.700613758818918e-09,
+          "max_scaled_error": 0.00042436330350642364,
+          "passed": true
+        },
+        "copasi_exact": {
+          "max_absolute_error": 6.557292486775168e-10,
+          "max_scaled_error": 4.8813558654216395e-05,
+          "passed": true
+        }
+      }
+    },
+    "state_dependent_10": {
+      "file": "state_dependent.xml",
+      "sha256": "5d5389dffa6dd4ab677974718f19ef29e3db2c75edfc2b2bd38d57bd34f0439e",
+      "species": [
+        "A",
+        "B"
+      ],
+      "samples": 11,
+      "time_start": 0.0,
+      "time_end": 1.0,
+      "quantity": "amount",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 5.546442527482043e-09,
+          "max_scaled_error": 0.000412886537097583,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 6.561420295980724e-10,
+          "max_scaled_error": 4.8844311556478264e-05,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 6.202584446057813e-09,
+          "max_scaled_error": 0.0004617308482507181,
+          "passed": true
+        },
+        "jax_exact": {
+          "max_absolute_error": 3.8815284320037335e-10,
+          "max_scaled_error": 3.0250970373449735e-05,
+          "passed": true
+        },
+        "roadrunner_exact": {
+          "max_absolute_error": 5.5468641901867954e-09,
+          "max_scaled_error": 0.000412917926380556,
+          "passed": true
+        },
+        "copasi_exact": {
+          "max_absolute_error": 6.89154400212999e-10,
+          "max_scaled_error": 4.8812922273276724e-05,
+          "passed": true
+        }
+      }
+    },
+    "chained_1": {
+      "file": "chained.xml",
+      "sha256": "282deb9acccf0ca21e62cc17b165229f896a5fe146c4396be24e1b6b588c4aae",
+      "species": [
+        "A",
+        "B"
+      ],
+      "samples": 2,
+      "time_start": 0.0,
+      "time_end": 1.0,
+      "quantity": "amount",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 3.079471566636016e-09,
+          "max_scaled_error": 0.000341207867843494,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 9.458905325665512e-10,
+          "max_scaled_error": 0.00010480541829491454,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 4.025361988180265e-09,
+          "max_scaled_error": 0.0004460132854231999,
+          "passed": true
+        },
+        "jax_exact": {
+          "max_absolute_error": 2.6905144778766044e-12,
+          "max_scaled_error": 2.98068074991426e-07,
+          "passed": true
+        },
+        "roadrunner_exact": {
+          "max_absolute_error": 3.0767813297138957e-09,
+          "max_scaled_error": 0.00034090979977053487,
+          "passed": true
+        },
+        "copasi_exact": {
+          "max_absolute_error": 9.485807694886716e-10,
+          "max_scaled_error": 0.0001051034863692812,
+          "passed": true
+        }
+      }
+    },
+    "chained_10": {
+      "file": "chained.xml",
+      "sha256": "282deb9acccf0ca21e62cc17b165229f896a5fe146c4396be24e1b6b588c4aae",
+      "species": [
+        "A",
+        "B"
+      ],
+      "samples": 11,
+      "time_start": 0.0,
+      "time_end": 1.0,
+      "quantity": "amount",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 2.9568592019302287e-09,
+          "max_scaled_error": 0.0003696420435512054,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 1.6703360916636711e-09,
+          "max_scaled_error": 0.00012701016063154243,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 4.244988804913419e-09,
+          "max_scaled_error": 0.000332691016722699,
+          "passed": true
+        },
+        "jax_exact": {
+          "max_absolute_error": 6.498870330773343e-10,
+          "max_scaled_error": 8.124348743923368e-05,
+          "passed": true
+        },
+        "roadrunner_exact": {
+          "max_absolute_error": 2.6829725108257207e-09,
+          "max_scaled_error": 0.0002883985565805818,
+          "passed": true
+        },
+        "copasi_exact": {
+          "max_absolute_error": 1.562016294087698e-09,
+          "max_scaled_error": 0.00011678660014042292,
+          "passed": true
+        }
+      }
+    },
+    "assigned_species_1": {
+      "file": "assigned_species.xml",
+      "sha256": "8d49bdec0d1600d2b72ce09bbd8493e0ef77f3432d261180f4bc1948917110e0",
+      "species": [
+        "A",
+        "B"
+      ],
+      "samples": 2,
+      "time_start": 0.0,
+      "time_end": 1.0,
+      "quantity": "amount",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 3.079471566636016e-09,
+          "max_scaled_error": 0.000341207867843494,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 9.458905325665512e-10,
+          "max_scaled_error": 0.00010480541829491454,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 4.025361988180265e-09,
+          "max_scaled_error": 0.0004460132854231999,
+          "passed": true
+        },
+        "jax_exact": {
+          "max_absolute_error": 2.6905144778766044e-12,
+          "max_scaled_error": 2.98068074991426e-07,
+          "passed": true
+        },
+        "roadrunner_exact": {
+          "max_absolute_error": 3.0767813297138957e-09,
+          "max_scaled_error": 0.00034090979977053487,
+          "passed": true
+        },
+        "copasi_exact": {
+          "max_absolute_error": 9.485807694886716e-10,
+          "max_scaled_error": 0.0001051034863692812,
+          "passed": true
+        }
+      }
+    },
+    "assigned_species_10": {
+      "file": "assigned_species.xml",
+      "sha256": "8d49bdec0d1600d2b72ce09bbd8493e0ef77f3432d261180f4bc1948917110e0",
+      "species": [
+        "A",
+        "B"
+      ],
+      "samples": 11,
+      "time_start": 0.0,
+      "time_end": 1.0,
+      "quantity": "amount",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 2.9568592019302287e-09,
+          "max_scaled_error": 0.0003696420435512054,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 1.6703360916636711e-09,
+          "max_scaled_error": 0.00012701016063154243,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 4.244988804913419e-09,
+          "max_scaled_error": 0.000332691016722699,
+          "passed": true
+        },
+        "jax_exact": {
+          "max_absolute_error": 6.498870330773343e-10,
+          "max_scaled_error": 8.124348743923368e-05,
+          "passed": true
+        },
+        "roadrunner_exact": {
+          "max_absolute_error": 2.6829725108257207e-09,
+          "max_scaled_error": 0.0002883985565805818,
+          "passed": true
+        },
+        "copasi_exact": {
+          "max_absolute_error": 1.562016294087698e-09,
+          "max_scaled_error": 0.00011678660014042292,
+          "passed": true
+        }
+      }
+    },
+    "concentration_species_1": {
+      "file": "concentration_species.xml",
+      "sha256": "9515b47f0346589fd128ffdd85df36802b22977e7468cb5a4835e35cd0156aef",
+      "species": [
+        "A",
+        "B"
+      ],
+      "samples": 2,
+      "time_start": 0.0,
+      "time_end": 1.0,
+      "quantity": "amount",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 3.079307364650674e-09,
+          "max_scaled_error": 0.0003411896864352757,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 9.460547900630445e-10,
+          "max_scaled_error": 0.00010482359970321882,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 4.025361988180265e-09,
+          "max_scaled_error": 0.0004460132854231999,
+          "passed": true
+        },
+        "jax_exact": {
+          "max_absolute_error": 2.5260349367783874e-12,
+          "max_scaled_error": 2.798866666491579e-07,
+          "passed": true
+        },
+        "roadrunner_exact": {
+          "max_absolute_error": 3.0767813297138957e-09,
+          "max_scaled_error": 0.00034090979977053487,
+          "passed": true
+        },
+        "copasi_exact": {
+          "max_absolute_error": 9.485807694886716e-10,
+          "max_scaled_error": 0.0001051034863692812,
+          "passed": true
+        }
+      }
+    },
+    "concentration_species_10": {
+      "file": "concentration_species.xml",
+      "sha256": "9515b47f0346589fd128ffdd85df36802b22977e7468cb5a4835e35cd0156aef",
+      "species": [
+        "A",
+        "B"
+      ],
+      "samples": 11,
+      "time_start": 0.0,
+      "time_end": 1.0,
+      "quantity": "amount",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 2.564430667817419e-09,
+          "max_scaled_error": 0.00028818996770359174,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 1.7712911137834908e-09,
+          "max_scaled_error": 0.00012089935606917096,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 4.244988804913419e-09,
+          "max_scaled_error": 0.000332691016722699,
+          "passed": true
+        },
+        "jax_exact": {
+          "max_absolute_error": 3.683356952777217e-10,
+          "max_scaled_error": 1.997889407470875e-05,
+          "passed": true
+        },
+        "roadrunner_exact": {
+          "max_absolute_error": 2.6829725108257207e-09,
+          "max_scaled_error": 0.0002883985565805818,
+          "passed": true
+        },
+        "copasi_exact": {
+          "max_absolute_error": 1.562016294087698e-09,
+          "max_scaled_error": 0.00011678660014042292,
+          "passed": true
+        }
+      }
+    },
+    "10": {
+      "file": "BIOMD0000000010.xml",
+      "sha256": "906964e07ffd570ad94a03c1222e230b54b913cd536b008392bfb6155930a966",
+      "species": [
+        "MKKK",
+        "MKKK_P",
+        "MKK",
+        "MKK_P",
+        "MKK_PP",
+        "MAPK",
+        "MAPK_P",
+        "MAPK_PP"
+      ],
+      "samples": 5001,
+      "time_start": 0.0,
+      "time_end": 50.0,
+      "quantity": "concentration",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 3.8017910242160724e-07,
+          "max_scaled_error": 0.0009740676480454387,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 1.0034668207481445e-07,
+          "max_scaled_error": 0.00038505562571724416,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 3.771615126879624e-07,
+          "max_scaled_error": 0.0009723264122429198,
+          "passed": true
+        }
+      }
+    },
+    "26": {
+      "file": "BIOMD0000000026.xml",
+      "sha256": "d293eb11fdd65b3150999c68edaf690a9449ea9e070a8f61878b3a4648eff7c5",
+      "species": [
+        "M",
+        "Mp",
+        "Mpp",
+        "MAPKK",
+        "MKP3",
+        "M_MAPKK",
+        "Mp_MAPKK",
+        "Mpp_MKP3",
+        "Mp_MKP3_dep",
+        "Mp_MKP3",
+        "M_MKP3"
+      ],
+      "samples": 5001,
+      "time_start": 0.0,
+      "time_end": 50.0,
+      "quantity": "concentration",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 2.6279514031557483e-07,
+          "max_scaled_error": 0.0012753265613692222,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 1.953600303750136e-07,
+          "max_scaled_error": 0.0009143156162942722,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 2.07330543844364e-07,
+          "max_scaled_error": 0.0009144912469062217,
+          "passed": true
+        }
+      }
+    },
+    "27": {
+      "file": "BIOMD0000000027.xml",
+      "sha256": "56d8acc83add5a262b6785b18f2e905e606b9072625e25ba1520306bc4d586bb",
+      "species": [
+        "M",
+        "Mp",
+        "Mpp"
+      ],
+      "samples": 5001,
+      "time_start": 0.0,
+      "time_end": 50.0,
+      "quantity": "concentration",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 4.080286863938909e-08,
+          "max_scaled_error": 0.0022841233523459782,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 3.276566529208935e-08,
+          "max_scaled_error": 0.0023093446842815278,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 1.015268180637463e-08,
+          "max_scaled_error": 0.0006666701216834131,
+          "passed": true
+        }
+      }
+    },
+    "29": {
+      "file": "BIOMD0000000029.xml",
+      "sha256": "c1eb117678b7d423b8e1d2fd7f493c865fb66559980256f3544938f5a431b530",
+      "species": [
+        "M",
+        "MpY",
+        "MpT",
+        "Mpp"
+      ],
+      "samples": 5001,
+      "time_start": 0.0,
+      "time_end": 50.0,
+      "quantity": "concentration",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 7.478540169358894e-07,
+          "max_scaled_error": 0.0014269652801652793,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 2.134460146407946e-07,
+          "max_scaled_error": 0.0012747668179303245,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 5.737679771300463e-07,
+          "max_scaled_error": 0.00044638154143442185,
+          "passed": true
+        }
+      }
+    },
+    "31": {
+      "file": "BIOMD0000000031.xml",
+      "sha256": "56ddd4cc0a0cf51c55a27fa386e0ee670c798ea69151ad39fadf363d0c0297a1",
+      "species": [
+        "M",
+        "Mp",
+        "Mpp"
+      ],
+      "samples": 5001,
+      "time_start": 0.0,
+      "time_end": 50.0,
+      "quantity": "concentration",
+      "comparisons": {
+        "jax_roadrunner": {
+          "max_absolute_error": 4.893985305898241e-08,
+          "max_scaled_error": 0.003105741177740294,
+          "passed": true
+        },
+        "jax_copasi": {
+          "max_absolute_error": 2.665325560258225e-08,
+          "max_scaled_error": 0.0027426356183741212,
+          "passed": true
+        },
+        "roadrunner_copasi": {
+          "max_absolute_error": 2.494090267646243e-08,
+          "max_scaled_error": 0.0006143001344631347,
+          "passed": true
+        }
+      }
+    }
+  },
+  "unsupported_rate_rule": "Rate rules and algebraic rules are not supported; only assignment rules are supported",
+  "all_comparisons_passed": true,
+  "source_sha256": {
+    "jaxkineticmodel/load_sbml/sbml_model.py": "ac7975a347d509e87983efce27709a3a7ed3541114e27e9ee116924d9bb48c6b",
+    "jaxkineticmodel/load_sbml/jax_kinetic_model.py": "931aa3d4778d59c930eb023dad87e97e063ed50a43745068a72c6712853d8ac8",
+    "jaxkineticmodel/load_sbml/export_sbml.py": "6f3f68a3a443f7a9329041e0d3eecc68e6d171907442d0bfc4ac19b1e2dc93e5"
+  }
+}

@@ -82,17 +82,19 @@ class SBMLExporter:
 
         # boundary conditions and species
         boundary_species = {}
+        amount_species = set(getattr(self.kmodel, 'amount_species', ()))
         for (s_id, s_comp) in species_compartments.items():
             s1 = export_model.createSpecies()
             check(s1, 'create species')
             check(s1.setId(s_id), 'set species id')
             check(s1.setCompartment(s_comp), 'set species s1 compartment')
-            check(s1.setHasOnlySubstanceUnits(False), 'set "hasOnlySubstanceUnits" on s1')
+            check(s1.setHasOnlySubstanceUnits(s_id in amount_species), 'set "hasOnlySubstanceUnits" on s1')
+            set_initial = s1.setInitialAmount if s_id in amount_species else s1.setInitialConcentration
             species_reference[s_id] = s1
 
             if s_id not in boundaries.keys():
                 check(s1.setConstant(False), 'set "constant" attribute on s1')
-                check(s1.setInitialAmount(float(initial_conditions[s_id])), 'set initial amount for s1')
+                check(set_initial(float(initial_conditions[s_id])), 'set initial value for s1')
                 check(s1.setSubstanceUnits('mole'), 'set substance units for s1')
                 check(s1.setBoundaryCondition(False), 'set "boundaryCondition" on s1')
 
@@ -106,7 +108,7 @@ class SBMLExporter:
                     assert isinstance(condition.sympified, sympy.Number)
                     check(s1.setConstant(True), 'set "constant" attribute on s1')
 
-                    check(s1.setInitialAmount(float(condition.sympified)), 'set "initialAmount" attribute on s1')
+                    check(set_initial(float(condition.sympified)), 'set initial value for s1')
                 elif not condition.is_constant:
                     logger.info(f"boundary not constant, support not tested yet")
                     check(s1.setConstant(False), 'set "constant" attribute on s1')
