@@ -26,7 +26,8 @@ def source_hashes():
     import jaxkineticmodel.load_sbml as source
     root = Path(source.__file__).parent
     return {f'jaxkineticmodel/load_sbml/{p}': hashlib.sha256((root/p).read_bytes()).hexdigest()
-            for p in ('sbml_model.py', 'jax_kinetic_model.py', 'export_sbml.py')}
+            for p in ('sbml_model.py', 'jax_kinetic_model.py', 'export_sbml.py',
+                      'sympy_converter.py', 'sbml_load_utils.py')}
 
 
 def load(path):

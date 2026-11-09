@@ -45,6 +45,19 @@ independent of the dependency constraint:
   functions. Each model now receives a copy of the symbolic flux dictionary.
 - Rate rules were treated as assignments. Unsupported rate/algebraic rules now
   fail explicitly; they are not claimed as newly supported.
+- The 35-model GRN audit exposed two further silent changes of equations:
+  `delay(x, tau)` became `x - tau`, and event assignments were never executed.
+  These models now raise explicit unsupported-feature errors. This does not add
+  delay or event support; the independent GRN solvers remain necessary for them.
+- Fractional reaction stoichiometries were truncated to integers. They now
+  retain their values, and repeated references to a species are added.
+- Assignment-rule species could be included in the ODE state even though their
+  values are derived. The state, initial vector and compartment-divisor vector
+  now share one independent-species inventory. Derived species need no initial
+  value and cannot be independent intervention targets.
+- Assignment dependencies now resolve independently of symbol names and rule
+  ordering, including user-defined function calls. Export preserves assignment
+  rules and their species, with function calls expanded into their expressions.
 
 For example, the two-litre constant-decay fixture previously returned
 `A(1) = 2 exp(-1/2) = 1.213061` instead of `2 exp(-1) = 0.735759`.
@@ -65,6 +78,16 @@ combinations of amount/concentration symbols and initial-value encodings,
 including SBML export/reimport. Assigned species outputs beyond the dynamic
 states, events, general rate rules, variable volumes and arbitrary SBML remain
 outside this evidence.
+
+`tests/test_sbml_semantics.py` adds seven regression cases from this audit.
+They compare fractional stoichiometry and derived-species dynamics against exact
+solutions, RoadRunner and COPASI, check a three-level rule chain with a function
+call, and verify assignment-rule export/reimport. An event fixture confirms that
+both reference engines apply the rate change, while this backend rejects it at
+both SBML Levels 2 and 3. A delay fixture verifies explicit rejection instead
+of the former subtraction. Passing an import is never counted as trajectory
+validation. The broader catalog audit lives in the GRN repository and reports
+unsupported models separately from validated or numerically failing models.
 
 The existing random DBTL documentation example initially exhausted the solver
 step budget for some sampled strains, then supplied NaN labels to XGBoost.

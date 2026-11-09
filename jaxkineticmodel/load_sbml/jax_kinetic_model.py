@@ -15,6 +15,44 @@ jax.config.update("jax_enable_x64", True)
 logger = get_logger(__name__)
 
 
+def expand_functions(expression, definitions, active=()):
+    """Expand SBML function calls without capturing their formal arguments."""
+    for call in expression.atoms(sympy.Function):
+        name = call.func.__name__
+        if name not in definitions:
+            continue
+        if name in active:
+            raise ValueError(f"Recursive SBML function definition: {name}")
+        definition = definitions[name]
+        if len(call.args) != len(definition.variables):
+            raise ValueError(f"Incorrect argument count for SBML function {name}")
+        arguments = [expand_functions(arg, definitions, active) for arg in call.args]
+        body = definition.expr.subs(dict(zip(definition.variables, arguments)), simultaneous=True)
+        expression = expression.xreplace({call: expand_functions(body, definitions, (*active, name))})
+    return expression
+
+
+def resolve_assignment_rules(rules, definitions):
+    """Resolve rule dependencies independently of names and SBML list order."""
+    symbolic = {sympy.Symbol(k): expand_functions(v, definitions) for k, v in rules.items()}
+    resolved = {}
+
+    def visit(symbol, active):
+        if symbol in resolved:
+            return resolved[symbol]
+        if symbol in active:
+            raise ValueError(f"Cyclic assignment rules involving {symbol}")
+        expression = symbolic[symbol]
+        dependencies = expression.free_symbols & symbolic.keys()
+        expression = expression.xreplace({s: visit(s, active | {symbol}) for s in dependencies})
+        resolved[symbol] = expression
+        return expression
+
+    for symbol in symbolic:
+        visit(symbol, set())
+    return resolved
+
+
 class JaxKineticModel:
     def __init__(
             self,
@@ -124,6 +162,7 @@ class NeuralODE:
         self.event_rules = event_rules
         self.compartments = compartments
         self.assignment_rules = assignment_rules
+        self.resolved_assignment_rules = resolve_assignment_rules(assignment_rules, lambda_functions)
         self.boundary_conditions = boundary_conditions
 
         self.y0 = kwargs['y0'] #not used in training, but only to process the initial conditions in Trainer object
@@ -160,18 +199,9 @@ class NeuralODE:
         (e.g. they should not be considered during optimization)
         """
         # arguments from the lambda expression are mapped to their respective symbols.
-        for reaction_name, equation in self.fluxes.items():
-            for func in equation.atoms(sympy.Function):
-                if hasattr(func, 'name'):
-                    variables = self.lambda_functions[func.name].variables
-                    variable_substitution = dict(zip(variables, func.args))
-                    expression = self.lambda_functions[func.name].expr
-                    expression = expression.subs(variable_substitution)
-                    equation = equation.subs({func: expression})
-
-
-
-            equation = equation.subs(self.assignment_rules)
+        for reaction_name, equation in self.fluxes_symbolic.items():
+            equation = expand_functions(equation, self.lambda_functions)
+            equation = equation.xreplace(self.resolved_assignment_rules)
             equation = equation.subs(self.boundary_conditions)
             if constant_parameters:
                 equation = equation.subs(constant_parameters)

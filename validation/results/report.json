@@ -12,7 +12,14 @@
     "python-copasi": "4.48.311",
     "python-libsbml": "5.21.2"
   },
-  "platform": "macOS-27.2-arm64-arm-64bit",
+  "source_sha256": {
+    "jaxkineticmodel/load_sbml/sbml_model.py": "57ddfef282e220affab237ce15e760e8b01aeb4b8e5fd4c39b91696f619477cb",
+    "jaxkineticmodel/load_sbml/jax_kinetic_model.py": "04dabdfc81da14da8a008aa406e723b974213f208442225a1d512d03ab4547b2",
+    "jaxkineticmodel/load_sbml/export_sbml.py": "54b054ceaef678ae77827ce560e198d70865a34692542c798235af2121114ee9",
+    "jaxkineticmodel/load_sbml/sympy_converter.py": "8b4bfec0fd8a6ea4dfd72bf6a66af8b50faa9f3975827aac609c460287b9e504",
+    "jaxkineticmodel/load_sbml/sbml_load_utils.py": "f914d0ee1bf06602d7c9ccac6643c9814ad4f63b9c520acf92e98839e64626ca"
+  },
+  "platform": "macOS-27.2.1-arm64-arm-64bit",
   "python": "3.12.13",
   "devices": [
     "cpu:0"
@@ -581,7 +588,7 @@
           "passed": true
         },
         "roadrunner_copasi": {
-          "max_absolute_error": 3.771615126879624e-07,
+          "max_absolute_error": 3.7716149847710767e-07,
           "max_scaled_error": 0.0009723264122429198,
           "passed": true
         }
@@ -614,13 +621,13 @@
           "passed": true
         },
         "jax_copasi": {
-          "max_absolute_error": 1.953600303750136e-07,
-          "max_scaled_error": 0.0009143156162942722,
+          "max_absolute_error": 1.953603145921079e-07,
+          "max_scaled_error": 0.0009143158175883236,
           "passed": true
         },
         "roadrunner_copasi": {
-          "max_absolute_error": 2.07330543844364e-07,
-          "max_scaled_error": 0.0009144912469062217,
+          "max_absolute_error": 2.073382034950555e-07,
+          "max_scaled_error": 0.000914491289298149,
           "passed": true
         }
       }
@@ -644,13 +651,13 @@
           "passed": true
         },
         "jax_copasi": {
-          "max_absolute_error": 3.276566529208935e-08,
-          "max_scaled_error": 0.0023093446842815278,
+          "max_absolute_error": 3.276562132725758e-08,
+          "max_scaled_error": 0.0023093446572529605,
           "passed": true
         },
         "roadrunner_copasi": {
-          "max_absolute_error": 1.015268180637463e-08,
-          "max_scaled_error": 0.0006666701216834131,
+          "max_absolute_error": 1.0152750640202157e-08,
+          "max_scaled_error": 0.0006666706040405453,
           "passed": true
         }
       }
@@ -705,12 +712,12 @@
           "passed": true
         },
         "jax_copasi": {
-          "max_absolute_error": 2.665325560258225e-08,
+          "max_absolute_error": 2.665325204986857e-08,
           "max_scaled_error": 0.0027426356183741212,
           "passed": true
         },
         "roadrunner_copasi": {
-          "max_absolute_error": 2.494090267646243e-08,
+          "max_absolute_error": 2.4940618459368125e-08,
           "max_scaled_error": 0.0006143001344631347,
           "passed": true
         }
@@ -718,10 +725,5 @@
     }
   },
   "unsupported_rate_rule": "Rate rules and algebraic rules are not supported; only assignment rules are supported",
-  "all_comparisons_passed": true,
-  "source_sha256": {
-    "jaxkineticmodel/load_sbml/sbml_model.py": "ac7975a347d509e87983efce27709a3a7ed3541114e27e9ee116924d9bb48c6b",
-    "jaxkineticmodel/load_sbml/jax_kinetic_model.py": "931aa3d4778d59c930eb023dad87e97e063ed50a43745068a72c6712853d8ac8",
-    "jaxkineticmodel/load_sbml/export_sbml.py": "6f3f68a3a443f7a9329041e0d3eecc68e6d171907442d0bfc4ac19b1e2dc93e5"
-  }
+  "all_comparisons_passed": true
 }

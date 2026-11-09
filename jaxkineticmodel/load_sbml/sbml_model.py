@@ -24,6 +24,11 @@ class SBMLModel:
         unsupported_rules = [r for r in self.model.getListOfRules() if not r.isAssignment()]
         if unsupported_rules:
             raise NotImplementedError("Rate rules and algebraic rules are not supported; only assignment rules are supported")
+        if self.model.getNumEvents():
+            raise NotImplementedError("SBML events require trigger and assignment execution, which this solver does not implement")
+        self.assignment_rules = get_assignment_rules_dictionary(self.model)
+        if any(self.model.getCompartment(s) is not None for s in self.assignment_rules):
+            raise NotImplementedError("Assignment rules for compartment sizes require dynamic volume handling")
         self.S = self._get_stoichiometric_matrix()
         # TODO the following two lines assume that self.S will never change
         self.reaction_names = list(self.S.columns)
@@ -49,7 +54,6 @@ class SBMLModel:
         self.species_compartments = {**self.species_compartments, **boundary_compartments}
 
         self.lambda_functions = get_lambda_function_dictionary(self.model)
-        self.assignment_rules = get_assignment_rules_dictionary(self.model)
         self.event_rules = get_events_dictionary(self.model)
 
 
@@ -108,7 +112,7 @@ class SBMLModel:
         for assignment in self.model.getListOfInitialAssignments():
             expression = assignment.getMath()
             expression = libsbml_converter.libsbml2sympy(expression)
-            initial_assignments[assignment.id] = expression
+            initial_assignments[assignment.getSymbol()] = expression
         return initial_assignments
 
     def _get_compartments(self):
@@ -127,7 +131,9 @@ class SBMLModel:
         reduced_species_list = []
         for s in self.model.getListOfSpecies():
             # these conditions do not have a rate law
-            if s.getConstant() and s.getBoundaryCondition():
+            if s.getId() in self.assignment_rules:
+                continue
+            elif s.getConstant() and s.getBoundaryCondition():
                 continue
             elif s.getBoundaryCondition() and not s.getConstant():
                 continue
@@ -142,13 +148,18 @@ class SBMLModel:
 
         stoichiometry_matrix = np.zeros((len(species_ids), len(reactions)))
         for reaction_index, reaction in enumerate(self.model.getListOfReactions()):
-            reactants = {r.getSpecies(): r.getStoichiometry() for r in reaction.getListOfReactants()}
-            products = {p.getSpecies(): p.getStoichiometry() for p in reaction.getListOfProducts()}
+            reactants, products = collections.defaultdict(float), collections.defaultdict(float)
+            for side, references in ((reactants, reaction.getListOfReactants()),
+                                     (products, reaction.getListOfProducts())):
+                for ref in references:
+                    if ref.isSetStoichiometryMath() or ref.getId() in self.assignment_rules:
+                        raise NotImplementedError("Variable stoichiometry is not supported")
+                    side[ref.getSpecies()] += ref.getStoichiometry()
 
             for species_index, species_node in enumerate(reduced_species_list):
                 species_id = species_node.getId()
 
-                net_stoichiometry = -int(reactants.get(species_id, 0)) + int(products.get(species_id, 0))
+                net_stoichiometry = -reactants.get(species_id, 0.) + products.get(species_id, 0.)
                 stoichiometry_matrix[species_index, reaction_index] = net_stoichiometry
 
         species_names = [s.getId() for s in reduced_species_list]
@@ -163,29 +174,13 @@ class SBMLModel:
         since it does not have a rate law
 
         also"""
-        species = self.model.getListOfSpecies()
         initial_concentration_dict = {}
-        for specimen in species:
-            if specimen.isSetConstant() and specimen.isSetBoundaryCondition():
-                # there are also non-stationary boundary conditions, deal with this later.
-                if specimen.getConstant() and specimen.getBoundaryCondition():
-                    logger.info(f"Constant Boundary Specimen {specimen.id}")
-                    continue
-                elif specimen.getBoundaryCondition() and not specimen.getConstant():
-                    continue
-                elif not specimen.getBoundaryCondition() and specimen.getConstant():
-                    continue  # not a boundary, but still a constant
-                elif not specimen.getBoundaryCondition() and not specimen.getConstant():
-                    if specimen.isSetInitialConcentration():
-
-                        initial_concentration_dict[specimen.id] = initial_species_value(specimen, self.model)
-                    elif specimen.isSetInitialAmount():
-                        initial_concentration_dict[specimen.id] = initial_species_value(specimen, self.model)
-                    else:
-                        logger.error(f"specimen {specimen.id} has no initial amount or concentration set")
+        for sid in self.species_names:
+            specimen = self.model.getSpecies(sid)
+            if sid in self.initial_assignments:
+                initial_concentration_dict[sid] = 0.  # Replaced before constructing y0.
             else:
-                logger.warn(f"{specimen.id} constant/boundary attribute not set. Assume that boundary is constant")
-                continue
+                initial_concentration_dict[sid] = initial_species_value(specimen, self.model)
 
         return initial_concentration_dict
 
@@ -209,25 +204,8 @@ class SBMLModel:
     def _get_compartments_initial_conditions(self, compartments):
         """Returns a list of the compartment names and values of
         the initial conditions. This is necessary in the dMdt to properly scale."""
-        species = self.model.getListOfSpecies()
-        compartment_list = []
-        species_compartments = {}
-
-        for specimen in species:
-            if specimen.isSetConstant() and specimen.isSetBoundaryCondition():
-                # there are also non-stationary boundary conditions, deal with this later.
-                if specimen.getConstant() and specimen.getBoundaryCondition():
-                    logger.info(f"Constant Boundary Specimen {specimen.id}")
-                    continue
-                elif specimen.getBoundaryCondition() and not specimen.getConstant():
-                    continue
-                elif not specimen.getBoundaryCondition() and specimen.getConstant():
-                    continue  # not a boundary, but still a constant
-                elif not specimen.getBoundaryCondition() and not specimen.getConstant():
-                    compartment_list.append(compartments[specimen.compartment])
-                    species_compartments[specimen.id] = specimen.getCompartment()
-
-        compartment_list = jnp.array(compartment_list)
+        species_compartments = {s.getId(): s.getCompartment() for s in self.model.getListOfSpecies()}
+        compartment_list = jnp.array([compartments[species_compartments[s]] for s in self.species_names])
         return species_compartments, compartment_list
 
     def _get_fluxes(self):
@@ -305,7 +283,10 @@ def get_constant_boundary_species(model):
     constant_boundary = {}
     boundary_compartments = {}
     species = model.getListOfSpecies()
+    assigned = {r.getVariable() for r in model.getListOfRules() if r.isAssignment()}
     for specimen in species:
+        if specimen.getId() in assigned:
+            continue
         if specimen.getBoundaryCondition() or specimen.getConstant():
             boundary_compartments[specimen.id] = specimen.getCompartment()
             if specimen.isSetInitialConcentration():
@@ -393,7 +374,7 @@ def get_assignment_rules_dictionary(model):
     assignment_dict = {}
     sorted_rules = sorted(model.rules, key=lambda r: r.getMetaId())
     for rule in sorted_rules:
-        id = rule.getId()
+        id = rule.getVariable()
         expr = rule.getMath()
         expr = libsbml_converter.libsbml2sympy(expr)
 
