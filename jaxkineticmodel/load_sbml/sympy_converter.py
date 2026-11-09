@@ -362,8 +362,8 @@ class LibSBMLConverter(Converter):
     def convert_libsbml_FUNCTION_DELAY(self,node,children)-> sympy.Basic:
         assert node.getType() == libsbml.AST_FUNCTION_DELAY
         assert len(children)==2
-        expression= children[0] - children[1]
-        return expression
+        raise NotImplementedError(
+            "SBML delay() requires a history-dependent solver; it cannot be converted to an ODE expression")
 
 
 

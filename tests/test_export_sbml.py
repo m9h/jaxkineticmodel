@@ -98,17 +98,17 @@ def import_new_sbml(filepath_export: str):
 
 
 
-def test_export_NeuralODE():
+def test_export_NeuralODE(tmp_path):
     model_name = "Smallbone2013_SerineBiosynthesis"
     filepath = f"models/sbml_models/working_models/{model_name}.xml"
-    output_dir = "models/manual_implementations/sbml_export"
+    output_dir = str(tmp_path)
     os.makedirs(output_dir, exist_ok=True)
     assert export_sbml1(filepath, model_name, output_dir)
 
 
-def test_export_sbml_NeuralODEBuild():
+def test_export_sbml_NeuralODEBuild(tmp_path):
     model_name = "test"
-    output_dir = "../models/manual_implementations/sbml_export"
+    output_dir = str(tmp_path)
     os.makedirs(output_dir, exist_ok=True)
     assert export_sbml2(output_dir, model_name)
 

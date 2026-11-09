@@ -2,11 +2,12 @@
 We need from model.get_kinetic_model() the Jaxkmodel.func before jit compiling """
 
 import libsbml
+import math
 import jax
 import jax.numpy as jnp
 from typing import Union
 from jaxkineticmodel.load_sbml.sympy_converter import SympyConverter, LibSBMLConverter
-from jaxkineticmodel.load_sbml.jax_kinetic_model import NeuralODE
+from jaxkineticmodel.load_sbml.jax_kinetic_model import NeuralODE, expand_functions
 from jaxkineticmodel.building_models.JaxKineticModelBuild import NeuralODEBuild, BoundaryCondition
 from jaxkineticmodel.utils import get_logger
 import sympy
@@ -58,9 +59,11 @@ class SBMLExporter:
         species_reference = {}
 
         # compartments: we need to retrieve compartment dictionary without interacting with
-        compartments = [float(i) for i in self.kmodel.func.compartment_values]
-        compartments = list(zip(species_compartments.values(), compartments))
-        compartments = dict(set(compartments))
+        if isinstance(self.kmodel, NeuralODE):
+            compartments = self.kmodel.compartments
+        else:
+            compartments = [float(i) for i in self.kmodel.func.compartment_values]
+            compartments = dict(zip(species_compartments.values(), compartments))
 
         # needs to be assessed separately
         if isinstance(self.kmodel, NeuralODE):
@@ -82,17 +85,23 @@ class SBMLExporter:
 
         # boundary conditions and species
         boundary_species = {}
+        amount_species = set(getattr(self.kmodel, 'amount_species', ()))
         for (s_id, s_comp) in species_compartments.items():
             s1 = export_model.createSpecies()
             check(s1, 'create species')
             check(s1.setId(s_id), 'set species id')
             check(s1.setCompartment(s_comp), 'set species s1 compartment')
-            check(s1.setHasOnlySubstanceUnits(False), 'set "hasOnlySubstanceUnits" on s1')
+            check(s1.setHasOnlySubstanceUnits(s_id in amount_species), 'set "hasOnlySubstanceUnits" on s1')
+            set_initial = s1.setInitialAmount if s_id in amount_species else s1.setInitialConcentration
             species_reference[s_id] = s1
 
-            if s_id not in boundaries.keys():
+            if isinstance(self.kmodel, NeuralODE) and s_id in self.kmodel.assignment_rules:
+                check(s1.setConstant(False), 'set assigned species constant flag')
+                check(s1.setBoundaryCondition(False), 'set assigned species boundary flag')
+                boundary_species[s_id] = s1
+            elif s_id not in boundaries.keys():
                 check(s1.setConstant(False), 'set "constant" attribute on s1')
-                check(s1.setInitialAmount(float(initial_conditions[s_id])), 'set initial amount for s1')
+                check(set_initial(float(initial_conditions[s_id])), 'set initial value for s1')
                 check(s1.setSubstanceUnits('mole'), 'set substance units for s1')
                 check(s1.setBoundaryCondition(False), 'set "boundaryCondition" on s1')
 
@@ -106,7 +115,7 @@ class SBMLExporter:
                     assert isinstance(condition.sympified, sympy.Number)
                     check(s1.setConstant(True), 'set "constant" attribute on s1')
 
-                    check(s1.setInitialAmount(float(condition.sympified)), 'set "initialAmount" attribute on s1')
+                    check(set_initial(float(condition.sympified)), 'set initial value for s1')
                 elif not condition.is_constant:
                     logger.info(f"boundary not constant, support not tested yet")
                     check(s1.setConstant(False), 'set "constant" attribute on s1')
@@ -135,7 +144,8 @@ class SBMLExporter:
                 check(p1.setConstant(False), 'set "constant" attribute on s1 for assignment rule')
             else:
                 check(p1.setConstant(True), 'set parameter name')
-            check(p1.setValue(float(p_value)), 'set parameter value')
+            if p_name not in self.kmodel.assignment_rules or math.isfinite(float(p_value)):
+                check(p1.setValue(float(p_value)), 'set parameter value')
 
         # reactions and boundaries are dealt with slightly different right now between two objects.
         # NeuralODE objects has sympy expressions for reactions, while in the NeuralODEBuild class
@@ -143,6 +153,7 @@ class SBMLExporter:
         # We therefore deal with them (for now) separately
         if isinstance(self.kmodel, NeuralODE):
             for (reaction, mechanism) in self.kmodel.fluxes_symbolic.items():
+                mechanism = expand_functions(mechanism, self.kmodel.lambda_functions)
 
                 r1 = export_model.createReaction()
                 check(r1, 'create reaction')
@@ -191,6 +202,13 @@ class SBMLExporter:
                     check(local_param.setValue(float(p_value)), 'set parameter name')
 
                 #local parameters (based on identifier)
+
+            # Preserve assignment rules; user-defined function calls are expanded.
+            for target, expression in self.kmodel.assignment_rules.items():
+                rule = export_model.createAssignmentRule()
+                check(rule.setVariable(target), 'set assignment target')
+                expression = expand_functions(expression, self.kmodel.lambda_functions)
+                check(rule.setMath(self.sympy_converter.sympy2libsbml(expression)), 'set assignment math')
 
         elif isinstance(self.kmodel, NeuralODEBuild):
             for reaction in self.kmodel.func.reactions:

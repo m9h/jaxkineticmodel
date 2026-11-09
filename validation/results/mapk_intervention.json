@@ -1,0 +1,109 @@
+{
+  "model": "BIOMD0000000031.xml",
+  "baseline_duration": 50,
+  "observation_duration": 20,
+  "intervention": "Transfer fraction of M to Mpp; preserve total MAPK",
+  "initial_fraction": 0.05,
+  "target_generating_fraction": 0.35,
+  "target_Mpp": 85.25675927305421,
+  "optimized_fraction": 0.349961388409376,
+  "initial_loss": 0.024304969160705937,
+  "final_loss": 8.244661438997581e-10,
+  "gradient_at_fraction_0.2": 272.5104068957858,
+  "finite_difference_gradients": {
+    "0.001": {
+      "roadrunner": 272.50974721936313,
+      "copasi": 272.50973401178055
+    },
+    "0.0001": {
+      "roadrunner": 272.5104135594947,
+      "copasi": 272.51040028701823
+    },
+    "1e-05": {
+      "roadrunner": 272.51042022307104,
+      "copasi": 272.51040693876405
+    }
+  },
+  "batch_fractions": [
+    0.0,
+    0.1,
+    0.2,
+    0.35,
+    0.6
+  ],
+  "batch_endpoint_Mpp": [
+    3.1374299625304563,
+    14.002915265331694,
+    35.968776915128124,
+    85.25675927305439,
+    187.3357828361436
+  ],
+  "comparisons": {
+    "0.0": {
+      "roadrunner": {
+        "max_absolute_error": 1.8162478454541997e-07,
+        "max_scaled_error": 0.0004031721040358618,
+        "passed": true
+      },
+      "copasi": {
+        "max_absolute_error": 3.696465000757598e-08,
+        "max_scaled_error": 8.257529468059846e-05,
+        "passed": true
+      }
+    },
+    "0.1": {
+      "roadrunner": {
+        "max_absolute_error": 3.6869779762582766e-07,
+        "max_scaled_error": 0.000540546638837976,
+        "passed": true
+      },
+      "copasi": {
+        "max_absolute_error": 1.4788120950015582e-07,
+        "max_scaled_error": 0.00020750379671213306,
+        "passed": true
+      }
+    },
+    "0.2": {
+      "roadrunner": {
+        "max_absolute_error": 4.999060507770992e-07,
+        "max_scaled_error": 0.0003743423550453078,
+        "passed": true
+      },
+      "copasi": {
+        "max_absolute_error": 5.771542532784224e-08,
+        "max_scaled_error": 9.207281110689016e-05,
+        "passed": true
+      }
+    },
+    "0.35": {
+      "roadrunner": {
+        "max_absolute_error": 3.3719442171786795e-07,
+        "max_scaled_error": 0.00039117811691987857,
+        "passed": true
+      },
+      "copasi": {
+        "max_absolute_error": 4.169152845179269e-08,
+        "max_scaled_error": 6.516007923933831e-05,
+        "passed": true
+      }
+    },
+    "0.6": {
+      "roadrunner": {
+        "max_absolute_error": 4.6611120296802255e-07,
+        "max_scaled_error": 0.0004094906976986992,
+        "passed": true
+      },
+      "copasi": {
+        "max_absolute_error": 9.565684422341292e-08,
+        "max_scaled_error": 0.00016864298343283236,
+        "passed": true
+      }
+    }
+  },
+  "all_checks_passed": true,
+  "source_sha256": {
+    "jaxkineticmodel/load_sbml/sbml_model.py": "ac7975a347d509e87983efce27709a3a7ed3541114e27e9ee116924d9bb48c6b",
+    "jaxkineticmodel/load_sbml/jax_kinetic_model.py": "931aa3d4778d59c930eb023dad87e97e063ed50a43745068a72c6712853d8ac8",
+    "jaxkineticmodel/load_sbml/export_sbml.py": "6f3f68a3a443f7a9329041e0d3eecc68e6d171907442d0bfc4ac19b1e2dc93e5"
+  }
+}
